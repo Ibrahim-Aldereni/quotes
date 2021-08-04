@@ -3,8 +3,38 @@
  */
 package quotes;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+
 public class App {
-    public static void main(String[] args) {
-        System.out.println(MyMethods.getOneQuote("resources/test.json"));
+    public static void main(String[] args) throws IOException {
+        //////////////////////////////////////////// lab 08 //////////////////////////////////////
+//        System.out.println(MyMethods.getOneQuote("resources/recentquotes.json").text);
+
+        //////////////////////////////////////////// lab 09 //////////////////////////////////////
+        try {
+            String apiUrl = "http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en";
+            HttpURLConnection connection = MyMethods.getConnection(apiUrl);
+            int status = connection.getResponseCode();
+            if (status == 200) {
+                BufferedReader bufferedReader = MyMethods.streamReader(connection);
+                String line = bufferedReader.readLine();
+
+                // write to local json file
+                MyMethods.writeFromApiToLocal("resources/fromapi.txt", "resources/fromapi.json", line);
+
+                // read from api
+                // print only the quote text
+                System.out.println("from internet >> " + line.substring(line.indexOf("\":\"") + 3, line.indexOf(".")));
+
+                bufferedReader.close();
+            } else {
+                System.out.println("error with status: " + status);
+            }
+            connection.disconnect();
+        } catch (IOException e) {
+            // print from local file if there is no internet
+            System.out.println("offline quote >> "+MyMethods.getOneQuoteApiLocal("resources/fromapi.json").quoteText);
+        }
     }
 }
