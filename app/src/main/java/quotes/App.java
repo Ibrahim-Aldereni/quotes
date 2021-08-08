@@ -29,7 +29,8 @@ public class App {
 
                 bufferedReader.close();
             } else {
-                System.out.println("error with status: " + status);
+                // print from local file if there is error
+                System.out.println("offline quote >> "+MyMethods.getOneQuoteApiLocal("resources/fromapi.json").quoteText);
             }
             connection.disconnect();
         } catch (IOException e) {
